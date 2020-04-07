@@ -21,8 +21,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.hrl.chaui.adapter.ChatAdapter;
+import com.hrl.chaui.bean.MenuFirstLevelMsgBody;
 import com.hrl.chaui.bean.MsgType;
 import com.hrl.chaui.util.LogUtil;
 import com.hrl.chaui.bean.Message;
@@ -41,12 +44,15 @@ import com.hrl.chaui.widget.RecordButton;
 import com.hrl.chaui.widget.StateButton;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.tools.ToastManage;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -76,14 +82,14 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     LinearLayout mLlEmotion;//表情布局
     @BindView(R.id.llAdd)
     LinearLayout mLlAdd;//添加布局
-     @BindView(R.id.swipe_chat)
-     SwipeRefreshLayout mSwipeRefresh;//下拉刷新
-     private ChatAdapter mAdapter;
-     public static final String 	  mSenderId="right";
-     public static final String     mTargetId="left";
-     public static final int       REQUEST_CODE_IMAGE=0000;
-     public static final int       REQUEST_CODE_VEDIO=1111;
-     public static final int       REQUEST_CODE_FILE=2222;
+    @BindView(R.id.swipe_chat)
+    SwipeRefreshLayout mSwipeRefresh;//下拉刷新
+    private ChatAdapter mAdapter;
+    public static final String mSenderId = "right";
+    public static final String mTargetId = "left";
+    public static final int REQUEST_CODE_IMAGE = 0000;
+    public static final int REQUEST_CODE_VEDIO = 1111;
+    public static final int REQUEST_CODE_FILE = 2222;
 
 
     @Override
@@ -94,98 +100,154 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-    private    ImageView  ivAudio;
+    private ImageView ivAudio;
 
     protected void initContent() {
-        ButterKnife.bind(this) ;
-        mAdapter=new ChatAdapter(this, new ArrayList<Message>());
-        LinearLayoutManager mLinearLayout=new LinearLayoutManager(this);
+        ButterKnife.bind(this);
+        mAdapter = new ChatAdapter(this, new ArrayList<Message>());
+
+        // TODO 一级菜单
+        Message messageMenuFirstLevel = getBaseReceiveMessage(MsgType.MENU_FIRST_LEVEL);
+        messageMenuFirstLevel.setBody(new MenuFirstLevelMsgBody());
+        mAdapter.addData(messageMenuFirstLevel);
+        // TODO 二级菜单
+        Message messageMenuSecondLevel = getBaseReceiveMessage(MsgType.MENU_SECOND_LEVEL);
+        mAdapter.addData(messageMenuSecondLevel);
+
+
+        LinearLayoutManager mLinearLayout = new LinearLayoutManager(this);
         mRvChat.setLayoutManager(mLinearLayout);
         mRvChat.setAdapter(mAdapter);
         mSwipeRefresh.setOnRefreshListener(this);
         initChatUi();
+
         mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
-                final  boolean isSend = mAdapter.getItem(position).getSenderId().equals(ChatActivity.mSenderId);
-                 if (ivAudio != null) {
-                    if (isSend){
-                        ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_right_3);
-                    }else {
-                        ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_left_3);
-                    }
-                     ivAudio = null;
-                    MediaManager.reset();
-                }else{
-                    ivAudio = view.findViewById(R.id.ivAudio);
-                      MediaManager.reset();
-                    if (isSend){
-                        ivAudio.setBackgroundResource(R.drawable.audio_animation_right_list);
-                    }else {
-                        ivAudio.setBackgroundResource(R.drawable.audio_animation_left_list);
-                    }
-                      AnimationDrawable  drawable = (AnimationDrawable) ivAudio.getBackground();
-                    drawable.start();
-                     MediaManager.playSound(ChatActivity.this,((AudioMsgBody)mAdapter.getData().get(position).getBody()).getLocalPath(), new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                             if (isSend){
-                                ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_right_3);
-                            }else {
-                                ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_left_3);
+                switch (view.getId()) {
+                    case R.id.tvQuestion1:
+                        Message mMessgaeText1 = getBaseReceiveMessage(MsgType.TEXT);
+                        TextMsgBody mTextMsgBody1 = new TextMsgBody();
+                        mTextMsgBody1.setMessage("怎么用白条付款，有利息吗");
+                        mMessgaeText1.setBody(mTextMsgBody1);
+                        mMessgaeText1.setSenderId(ChatActivity.mSenderId);
+                        mAdapter.addData(mMessgaeText1);
+                        updateMsg(mMessgaeText1, new MessageSendCallback() {
+                            @Override
+                            public void onSent() {
+                                Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                                TextMsgBody mTextMsgBody = new TextMsgBody();
+                                mTextMsgBody.setMessage("直接支付即可，还款日之前还款没有利息。");
+                                mMessgaeText.setBody(mTextMsgBody);
+                                mMessgaeText.setSenderId(ChatActivity.mTargetId);
+                                mAdapter.addData(mMessgaeText);
                             }
-
-                            MediaManager.release();
-                         }
-                    });
+                        });
+                        break;
+                    case R.id.tvQuestion2:
+                        Message mMessgaeText2 = getBaseReceiveMessage(MsgType.TEXT);
+                        TextMsgBody mTextMsgBody2 = new TextMsgBody();
+                        mTextMsgBody2.setMessage("金条是什么");
+                        mMessgaeText2.setBody(mTextMsgBody2);
+                        mMessgaeText2.setSenderId(ChatActivity.mSenderId);
+                        mAdapter.addData(mMessgaeText2);
+                        updateMsg(mMessgaeText2, new MessageSendCallback() {
+                            @Override
+                            public void onSent() {
+                                Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                                TextMsgBody mTextMsgBody = new TextMsgBody();
+                                mTextMsgBody.setMessage("金条是一项现金借贷服务，借款成功后可提现至本人储蓄卡或信用卡。");
+                                mMessgaeText.setBody(mTextMsgBody);
+                                mMessgaeText.setSenderId(ChatActivity.mTargetId);
+                                mAdapter.addData(mMessgaeText);
+                            }
+                        });
+                        break;
+                    case R.id.layoutCommonQuestion:
+                        Toast.makeText(ChatActivity.this, "问题22222", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.layoutSecondMenu1:
+                        Toast.makeText(ChatActivity.this, "问题22222", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        onItemChildClickListenerDefault(view, position);
+                        break;
                 }
+
+
             }
         });
 
-     }
+    }
 
+    private void onItemChildClickListenerDefault(View view, int position) {
+        final boolean isSend = mAdapter.getItem(position).getSenderId().equals(ChatActivity.mSenderId);
+        if (ivAudio != null) {
+            if (isSend) {
+                ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_right_3);
+            } else {
+                ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_left_3);
+            }
+            ivAudio = null;
+            MediaManager.reset();
+        } else {
+            ivAudio = view.findViewById(R.id.ivAudio);
+            MediaManager.reset();
+            if (isSend) {
+                ivAudio.setBackgroundResource(R.drawable.audio_animation_right_list);
+            } else {
+                ivAudio.setBackgroundResource(R.drawable.audio_animation_left_list);
+            }
+            AnimationDrawable drawable = (AnimationDrawable) ivAudio.getBackground();
+            drawable.start();
+            MediaManager.playSound(ChatActivity.this, ((AudioMsgBody) mAdapter.getData().get(position).getBody()).getLocalPath(), new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    if (isSend) {
+                        ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_right_3);
+                    } else {
+                        ivAudio.setBackgroundResource(R.mipmap.audio_animation_list_left_3);
+                    }
 
-
-
-
-
-
-
+                    MediaManager.release();
+                }
+            });
+        }
+    }
 
     @Override
     public void onRefresh() {
-          //下拉刷新模拟获取历史消息
-          List<Message>  mReceiveMsgList=new ArrayList<Message>();
-          //构建文本消息
-          Message mMessgaeText=getBaseReceiveMessage(MsgType.TEXT);
-          TextMsgBody mTextMsgBody=new TextMsgBody();
-          mTextMsgBody.setMessage("收到的消息");
-          mMessgaeText.setBody(mTextMsgBody);
-          mReceiveMsgList.add(mMessgaeText);
-          //构建图片消息
-          Message mMessgaeImage=getBaseReceiveMessage(MsgType.IMAGE);
-          ImageMsgBody mImageMsgBody=new ImageMsgBody();
-          mImageMsgBody.setThumbUrl("https://c-ssl.duitang.com/uploads/item/201208/30/20120830173930_PBfJE.thumb.700_0.jpeg");
-          mMessgaeImage.setBody(mImageMsgBody);
-          mReceiveMsgList.add(mMessgaeImage);
-          //构建文件消息
-          Message mMessgaeFile=getBaseReceiveMessage(MsgType.FILE);
-          FileMsgBody mFileMsgBody=new FileMsgBody();
-          mFileMsgBody.setDisplayName("收到的文件");
-          mFileMsgBody.setSize(12);
-          mMessgaeFile.setBody(mFileMsgBody);
-          mReceiveMsgList.add(mMessgaeFile);
-          mAdapter.addData(0,mReceiveMsgList);
-          mSwipeRefresh.setRefreshing(false);
+        //下拉刷新模拟获取历史消息
+        List<Message> mReceiveMsgList = new ArrayList<Message>();
+        //构建文本消息
+        Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+        TextMsgBody mTextMsgBody = new TextMsgBody();
+        mTextMsgBody.setMessage("收到的消息");
+        mMessgaeText.setBody(mTextMsgBody);
+        mReceiveMsgList.add(mMessgaeText);
+        //构建图片消息
+        Message mMessgaeImage = getBaseReceiveMessage(MsgType.IMAGE);
+        ImageMsgBody mImageMsgBody = new ImageMsgBody();
+        mImageMsgBody.setThumbUrl("https://c-ssl.duitang.com/uploads/item/201208/30/20120830173930_PBfJE.thumb.700_0.jpeg");
+        mMessgaeImage.setBody(mImageMsgBody);
+        mReceiveMsgList.add(mMessgaeImage);
+        //构建文件消息
+        Message mMessgaeFile = getBaseReceiveMessage(MsgType.FILE);
+        FileMsgBody mFileMsgBody = new FileMsgBody();
+        mFileMsgBody.setDisplayName("收到的文件");
+        mFileMsgBody.setSize(12);
+        mMessgaeFile.setBody(mFileMsgBody);
+        mReceiveMsgList.add(mMessgaeFile);
+        //TODO 关闭历史消息的展示
+//        mAdapter.addData(0, mReceiveMsgList);
+        mSwipeRefresh.setRefreshing(false);
     }
 
 
-
-
-    private void initChatUi(){
+    private void initChatUi() {
         //mBtnAudio
-        final ChatUiHelper mUiHelper= ChatUiHelper.with(this);
+        final ChatUiHelper mUiHelper = ChatUiHelper.with(this);
         mUiHelper.bindContentLayout(mLlContent)
                 .bindttToSendButton(mBtnSend)
                 .bindEditText(mEtContent)
@@ -229,16 +291,16 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
             @Override
             public void onFinishedRecord(String audioPath, int time) {
                 LogUtil.d("录音结束回调");
-                 File file = new File(audioPath);
-                 if (file.exists()) {
-                    sendAudioMessage(audioPath,time);
+                File file = new File(audioPath);
+                if (file.exists()) {
+                    sendAudioMessage(audioPath, time);
                 }
             }
         });
 
     }
 
-    @OnClick({R.id.btn_send,R.id.rlPhoto,R.id.rlVideo,R.id.rlLocation,R.id.rlFile})
+    @OnClick({R.id.btn_send, R.id.rlPhoto, R.id.rlVideo, R.id.rlLocation, R.id.rlFile})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_send:
@@ -246,21 +308,18 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                 mEtContent.setText("");
                 break;
             case R.id.rlPhoto:
-                PictureFileUtil.openGalleryPic(ChatActivity.this,REQUEST_CODE_IMAGE);
+                PictureFileUtil.openGalleryPic(ChatActivity.this, REQUEST_CODE_IMAGE);
                 break;
             case R.id.rlVideo:
-                PictureFileUtil.openGalleryAudio(ChatActivity.this,REQUEST_CODE_VEDIO);
+                PictureFileUtil.openGalleryAudio(ChatActivity.this, REQUEST_CODE_VEDIO);
                 break;
             case R.id.rlFile:
-                PictureFileUtil.openFile(ChatActivity.this,REQUEST_CODE_FILE);
+                PictureFileUtil.openFile(ChatActivity.this, REQUEST_CODE_FILE);
                 break;
             case R.id.rlLocation:
                 break;
         }
     }
-
-
-
 
 
     @Override
@@ -270,14 +329,14 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
             switch (requestCode) {
                 case REQUEST_CODE_FILE:
                     String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-                    LogUtil.d("获取到的文件路径:"+filePath);
+                    LogUtil.d("获取到的文件路径:" + filePath);
                     sendFileMessage(mSenderId, mTargetId, filePath);
                     break;
                 case REQUEST_CODE_IMAGE:
                     // 图片选择结果回调
                     List<LocalMedia> selectListPic = PictureSelector.obtainMultipleResult(data);
                     for (LocalMedia media : selectListPic) {
-                        LogUtil.d("获取图片路径成功:"+  media.getPath());
+                        LogUtil.d("获取图片路径成功:" + media.getPath());
                         sendImageMessage(media);
                     }
                     break;
@@ -285,7 +344,7 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                     // 视频选择结果回调
                     List<LocalMedia> selectListVideo = PictureSelector.obtainMultipleResult(data);
                     for (LocalMedia media : selectListVideo) {
-                        LogUtil.d("获取视频路径成功:"+  media.getPath());
+                        LogUtil.d("获取视频路径成功:" + media.getPath());
                         sendVedioMessage(media);
                     }
                     break;
@@ -294,30 +353,27 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-
-
     //文本消息
-    private void sendTextMsg(String hello)  {
-        final Message mMessgae=getBaseSendMessage(MsgType.TEXT);
-        TextMsgBody mTextMsgBody=new TextMsgBody();
+    private void sendTextMsg(String hello) {
+        final Message mMessgae = getBaseSendMessage(MsgType.TEXT);
+        TextMsgBody mTextMsgBody = new TextMsgBody();
         mTextMsgBody.setMessage(hello);
         mMessgae.setBody(mTextMsgBody);
         //开始发送
-        mAdapter.addData( mMessgae);
+        mAdapter.addData(mMessgae);
         //模拟两秒后发送成功
         updateMsg(mMessgae);
     }
 
 
-
     //图片消息
     private void sendImageMessage(final LocalMedia media) {
-        final Message mMessgae=getBaseSendMessage(MsgType.IMAGE);
-        ImageMsgBody mImageMsgBody=new ImageMsgBody();
+        final Message mMessgae = getBaseSendMessage(MsgType.IMAGE);
+        ImageMsgBody mImageMsgBody = new ImageMsgBody();
         mImageMsgBody.setThumbUrl(media.getCompressPath());
         mMessgae.setBody(mImageMsgBody);
         //开始发送
-        mAdapter.addData( mMessgae);
+        mAdapter.addData(mMessgae);
         //模拟两秒后发送成功
         updateMsg(mMessgae);
     }
@@ -325,9 +381,9 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     //视频消息
     private void sendVedioMessage(final LocalMedia media) {
-        final Message mMessgae=getBaseSendMessage(MsgType.VIDEO);
+        final Message mMessgae = getBaseSendMessage(MsgType.VIDEO);
         //生成缩略图路径
-        String vedioPath=media.getPath();
+        String vedioPath = media.getPath();
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(vedioPath);
         Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime();
@@ -342,15 +398,15 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.flush();
             out.close();
-        }catch ( Exception e) {
-            LogUtil.d("视频缩略图路径获取失败："+e.toString());
+        } catch (Exception e) {
+            LogUtil.d("视频缩略图路径获取失败：" + e.toString());
             e.printStackTrace();
         }
-        VideoMsgBody mImageMsgBody=new VideoMsgBody();
+        VideoMsgBody mImageMsgBody = new VideoMsgBody();
         mImageMsgBody.setExtra(urlpath);
         mMessgae.setBody(mImageMsgBody);
         //开始发送
-        mAdapter.addData( mMessgae);
+        mAdapter.addData(mMessgae);
         //模拟两秒后发送成功
         updateMsg(mMessgae);
 
@@ -358,36 +414,36 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     //文件消息
     private void sendFileMessage(String from, String to, final String path) {
-        final Message mMessgae=getBaseSendMessage(MsgType.FILE);
-        FileMsgBody mFileMsgBody=new FileMsgBody();
+        final Message mMessgae = getBaseSendMessage(MsgType.FILE);
+        FileMsgBody mFileMsgBody = new FileMsgBody();
         mFileMsgBody.setLocalPath(path);
         mFileMsgBody.setDisplayName(FileUtils.getFileName(path));
         mFileMsgBody.setSize(FileUtils.getFileLength(path));
         mMessgae.setBody(mFileMsgBody);
         //开始发送
-        mAdapter.addData( mMessgae);
+        mAdapter.addData(mMessgae);
         //模拟两秒后发送成功
         updateMsg(mMessgae);
 
     }
 
     //语音消息
-    private void sendAudioMessage(  final String path,int time) {
-        final Message mMessgae=getBaseSendMessage(MsgType.AUDIO);
-        AudioMsgBody mFileMsgBody=new AudioMsgBody();
+    private void sendAudioMessage(final String path, int time) {
+        final Message mMessgae = getBaseSendMessage(MsgType.AUDIO);
+        AudioMsgBody mFileMsgBody = new AudioMsgBody();
         mFileMsgBody.setLocalPath(path);
         mFileMsgBody.setDuration(time);
         mMessgae.setBody(mFileMsgBody);
         //开始发送
-        mAdapter.addData( mMessgae);
+        mAdapter.addData(mMessgae);
         //模拟两秒后发送成功
         updateMsg(mMessgae);
     }
 
 
-    private Message getBaseSendMessage(MsgType msgType){
-        Message mMessgae=new Message();
-        mMessgae.setUuid(UUID.randomUUID()+"");
+    private Message getBaseSendMessage(MsgType msgType) {
+        Message mMessgae = new Message();
+        mMessgae.setUuid(UUID.randomUUID() + "");
         mMessgae.setSenderId(mSenderId);
         mMessgae.setTargetId(mTargetId);
         mMessgae.setSentTime(System.currentTimeMillis());
@@ -397,9 +453,9 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-    private Message getBaseReceiveMessage(MsgType msgType){
-        Message mMessgae=new Message();
-        mMessgae.setUuid(UUID.randomUUID()+"");
+    private Message getBaseReceiveMessage(MsgType msgType) {
+        Message mMessgae = new Message();
+        mMessgae.setUuid(UUID.randomUUID() + "");
         mMessgae.setSenderId(mTargetId);
         mMessgae.setTargetId(mSenderId);
         mMessgae.setSentTime(System.currentTimeMillis());
@@ -411,24 +467,46 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void updateMsg(final Message mMessgae) {
         mRvChat.scrollToPosition(mAdapter.getItemCount() - 1);
-         //模拟2秒后发送成功
+        //模拟2秒后发送成功
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                int position=0;
+                int position = 0;
                 mMessgae.setSentStatus(MsgSendStatus.SENT);
                 //更新单个子条目
-                for (int i=0;i<mAdapter.getData().size();i++){
-                    Message mAdapterMessage=mAdapter.getData().get(i);
-                    if (mMessgae.getUuid().equals(mAdapterMessage.getUuid())){
-                        position=i;
+                for (int i = 0; i < mAdapter.getData().size(); i++) {
+                    Message mAdapterMessage = mAdapter.getData().get(i);
+                    if (mMessgae.getUuid().equals(mAdapterMessage.getUuid())) {
+                        position = i;
                     }
                 }
                 mAdapter.notifyItemChanged(position);
             }
-        }, 2000);
-
+        }, 1000);
     }
 
 
+    private void updateMsg(final Message mMessgae, final MessageSendCallback callback) {
+        mRvChat.scrollToPosition(mAdapter.getItemCount() - 1);
+        //模拟2秒后发送成功
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                int position = 0;
+                mMessgae.setSentStatus(MsgSendStatus.SENT);
+                //更新单个子条目
+                for (int i = 0; i < mAdapter.getData().size(); i++) {
+                    Message mAdapterMessage = mAdapter.getData().get(i);
+                    if (mMessgae.getUuid().equals(mAdapterMessage.getUuid())) {
+                        position = i;
+                    }
+                }
+                mAdapter.notifyItemChanged(position);
+                callback.onSent();
+            }
+        }, 1000);
+    }
+
+    public interface MessageSendCallback {
+        void onSent();
+    }
 
 }
