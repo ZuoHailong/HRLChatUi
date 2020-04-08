@@ -1,15 +1,16 @@
 package com.hrl.chaui.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -21,35 +22,39 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.hrl.chaui.adapter.ChatAdapter;
-import com.hrl.chaui.bean.MenuFirstLevelMsgBody;
-import com.hrl.chaui.bean.MsgType;
-import com.hrl.chaui.util.LogUtil;
-import com.hrl.chaui.bean.Message;
 import com.hrl.chaui.R;
+import com.hrl.chaui.adapter.ChatAdapter;
 import com.hrl.chaui.bean.AudioMsgBody;
+import com.hrl.chaui.bean.ButtonMsgBody;
+import com.hrl.chaui.bean.CommonQuestionListMsgBody;
 import com.hrl.chaui.bean.FileMsgBody;
 import com.hrl.chaui.bean.ImageMsgBody;
+import com.hrl.chaui.bean.MenuFirstLevelMsgBody;
+import com.hrl.chaui.bean.MenuSecondLevelMsgBody;
+import com.hrl.chaui.bean.Message;
 import com.hrl.chaui.bean.MsgSendStatus;
+import com.hrl.chaui.bean.MsgType;
 import com.hrl.chaui.bean.TextMsgBody;
 import com.hrl.chaui.bean.VideoMsgBody;
 import com.hrl.chaui.util.ChatUiHelper;
 import com.hrl.chaui.util.FileUtils;
+import com.hrl.chaui.util.LogUtil;
 import com.hrl.chaui.util.PictureFileUtil;
 import com.hrl.chaui.widget.MediaManager;
 import com.hrl.chaui.widget.RecordButton;
 import com.hrl.chaui.widget.StateButton;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.entity.LocalMedia;
-import com.luck.picture.lib.tools.ToastManage;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,6 +89,14 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     LinearLayout mLlAdd;//添加布局
     @BindView(R.id.swipe_chat)
     SwipeRefreshLayout mSwipeRefresh;//下拉刷新
+    @BindView(R.id.tvAskOtherQuestion)
+    TextView tvAskOtherQuestion;
+    @BindView(R.id.layoutOtherQuestion)
+    LinearLayout layoutOtherQuestion;
+    @BindView(R.id.layoutOrderListPopup)
+    RelativeLayout layoutOrderListPopup;
+    @BindView(R.id.layoutOrderListPopupBg)
+    RelativeLayout layoutOrderListPopupBg;
     private ChatAdapter mAdapter;
     public static final String mSenderId = "right";
     public static final String mTargetId = "left";
@@ -91,29 +104,27 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
     public static final int REQUEST_CODE_VEDIO = 1111;
     public static final int REQUEST_CODE_FILE = 2222;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        ButterKnife.bind(this);
         initContent();
-    }
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initRobot();
+            }
+        }, 1000);
+
+    }
 
     private ImageView ivAudio;
 
     protected void initContent() {
         ButterKnife.bind(this);
         mAdapter = new ChatAdapter(this, new ArrayList<Message>());
-
-        // TODO 一级菜单
-        Message messageMenuFirstLevel = getBaseReceiveMessage(MsgType.MENU_FIRST_LEVEL);
-        messageMenuFirstLevel.setBody(new MenuFirstLevelMsgBody());
-        mAdapter.addData(messageMenuFirstLevel);
-        // TODO 二级菜单
-        Message messageMenuSecondLevel = getBaseReceiveMessage(MsgType.MENU_SECOND_LEVEL);
-        mAdapter.addData(messageMenuSecondLevel);
-
 
         LinearLayoutManager mLinearLayout = new LinearLayoutManager(this);
         mRvChat.setLayoutManager(mLinearLayout);
@@ -127,11 +138,11 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                 switch (view.getId()) {
                     case R.id.tvQuestion1:
-                        Message mMessgaeText1 = getBaseReceiveMessage(MsgType.TEXT);
+                    case R.id.tvCommonQuestion1:
+                        Message mMessgaeText1 = getBaseSendMessage(MsgType.TEXT);
                         TextMsgBody mTextMsgBody1 = new TextMsgBody();
                         mTextMsgBody1.setMessage("怎么用白条付款，有利息吗");
                         mMessgaeText1.setBody(mTextMsgBody1);
-                        mMessgaeText1.setSenderId(ChatActivity.mSenderId);
                         mAdapter.addData(mMessgaeText1);
                         updateMsg(mMessgaeText1, new MessageSendCallback() {
                             @Override
@@ -140,17 +151,23 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                                 TextMsgBody mTextMsgBody = new TextMsgBody();
                                 mTextMsgBody.setMessage("直接支付即可，还款日之前还款没有利息。");
                                 mMessgaeText.setBody(mTextMsgBody);
-                                mMessgaeText.setSenderId(ChatActivity.mTargetId);
                                 mAdapter.addData(mMessgaeText);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mRvChat.smoothScrollBy(0, 10000);
+                                    }
+                                }, 100);
                             }
                         });
                         break;
                     case R.id.tvQuestion2:
-                        Message mMessgaeText2 = getBaseReceiveMessage(MsgType.TEXT);
+                    case R.id.tvCommonQuestion2:
+                        Message mMessgaeText2 = getBaseSendMessage(MsgType.TEXT);
                         TextMsgBody mTextMsgBody2 = new TextMsgBody();
                         mTextMsgBody2.setMessage("金条是什么");
                         mMessgaeText2.setBody(mTextMsgBody2);
-                        mMessgaeText2.setSenderId(ChatActivity.mSenderId);
                         mAdapter.addData(mMessgaeText2);
                         updateMsg(mMessgaeText2, new MessageSendCallback() {
                             @Override
@@ -159,16 +176,104 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                                 TextMsgBody mTextMsgBody = new TextMsgBody();
                                 mTextMsgBody.setMessage("金条是一项现金借贷服务，借款成功后可提现至本人储蓄卡或信用卡。");
                                 mMessgaeText.setBody(mTextMsgBody);
-                                mMessgaeText.setSenderId(ChatActivity.mTargetId);
                                 mAdapter.addData(mMessgaeText);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mRvChat.smoothScrollBy(0, 10000);
+                                    }
+                                }, 100);
                             }
                         });
                         break;
                     case R.id.layoutCommonQuestion:
-                        Toast.makeText(ChatActivity.this, "问题22222", Toast.LENGTH_SHORT).show();
+
+                        Message mMessgaeTextCommonQuestion = getBaseSendMessage(MsgType.TEXT);
+                        TextMsgBody mTextMsgBodyCommonQuestion = new TextMsgBody();
+                        mTextMsgBodyCommonQuestion.setMessage("我有问题要咨询");
+                        mMessgaeTextCommonQuestion.setBody(mTextMsgBodyCommonQuestion);
+                        mAdapter.addData(mMessgaeTextCommonQuestion);
+                        updateMsg(mMessgaeTextCommonQuestion, new MessageSendCallback() {
+                            @Override
+                            public void onSent() {
+
+                                // 常见问题
+                                Message mMessgaeCommonQuestion = getBaseReceiveMessage(MsgType.COMMON_QUESTION_LIST);
+                                CommonQuestionListMsgBody mTextMsgBodyCommonQuestion = new CommonQuestionListMsgBody();
+                                mAdapter.addData(mMessgaeCommonQuestion.setBody(mTextMsgBodyCommonQuestion));
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                                        TextMsgBody mTextMsgBody = new TextMsgBody();
+                                        mTextMsgBody.setMessage("若有其他疑问，请点击下方【在线客服】按钮联系在线客服咨询。");
+                                        mMessgaeText.setBody(mTextMsgBody);
+                                        mAdapter.addData(mMessgaeText);
+
+                                        Message mMessgaeButton = getBaseSendMessage(MsgType.BUTTON);
+                                        mMessgaeButton.setBody(new ButtonMsgBody().setMessage("联系在线客服"));
+                                        mAdapter.addData(mMessgaeButton);
+
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                mRvChat.smoothScrollBy(0, 10000);
+                                            }
+                                        }, 100);
+                                    }
+                                }, 500);
+
+                            }
+                        });
+
+                        break;
+                    case R.id.button:
+                        Message mMessgaeTextRobot = getBaseReceiveMessage(MsgType.CENTER_TEXT_GRAY_BG);
+                        TextMsgBody mTextMsgRobot = new TextMsgBody();
+                        mTextMsgRobot.setMessage("在线客服 小鼓 为您服务，您目前排队在 12 位。");
+                        mMessgaeTextRobot.setBody(mTextMsgRobot);
+                        mAdapter.addData(mMessgaeTextRobot);
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRvChat.smoothScrollBy(0, 10000);
+                            }
+                        }, 100);
                         break;
                     case R.id.layoutSecondMenu1:
-                        Toast.makeText(ChatActivity.this, "问题22222", Toast.LENGTH_SHORT).show();
+                        Intent intentSecondMenu1 = new Intent(ChatActivity.this, OtherActivity.class);
+                        intentSecondMenu1.putExtra("title", "我要催单");
+                        startActivity(intentSecondMenu1);
+                        break;
+                    case R.id.layoutSecondMenu2:
+                        Intent intentSecondMenu2 = new Intent(ChatActivity.this, OtherActivity.class);
+                        intentSecondMenu2.putExtra("title", "退货返修");
+                        startActivity(intentSecondMenu2);
+                        break;
+                    case R.id.layoutSecondMenu3:
+                        Intent intentSecondMenu3 = new Intent(ChatActivity.this, WebViewActivity.class);
+                        intentSecondMenu3.putExtra("title", "疫情助理");
+                        startActivity(intentSecondMenu3);
+                        break;
+                    case R.id.layoutSecondMenu4:
+                        Intent intentSecondMenu4 = new Intent(ChatActivity.this, OtherActivity.class);
+                        intentSecondMenu4.putExtra("title", "余额提现");
+                        startActivity(intentSecondMenu4);
+                        break;
+                    case R.id.layoutSecondMenu5:
+                        Intent intentSecondMenu5 = new Intent(ChatActivity.this, OtherActivity.class);
+                        intentSecondMenu5.putExtra("title", "账户安全");
+                        startActivity(intentSecondMenu5);
+                        break;
+                    case R.id.tvQuestion3:
+                    case R.id.tvCommonQuestion3:
+                    case R.id.tvQuestion4:
+                    case R.id.tvCommonQuestion4:
+                    case R.id.layoutActivity:
+                    case R.id.layoutAfterSale:
                         break;
                     default:
                         onItemChildClickListenerDefault(view, position);
@@ -216,6 +321,55 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
+    private void initRobot() {
+        // TODO 时间
+        Message mMessgaeTextTime = getBaseReceiveMessage(MsgType.CENTER_TEXT_GRAY_BG);
+        TextMsgBody mTextMsgTime = new TextMsgBody();
+        mTextMsgTime.setMessage(new SimpleDateFormat("HH:mm").format(new Date()));
+        mMessgaeTextTime.setBody(mTextMsgTime);
+        mAdapter.addData(mMessgaeTextTime);
+
+        // TODO 智能客服
+        Message mMessgaeTextRobot = getBaseReceiveMessage(MsgType.CENTER_TEXT_GRAY_BG);
+        TextMsgBody mTextMsgRobot = new TextMsgBody();
+        mTextMsgRobot.setMessage("您好，智能客服助手为您服务！");
+        mMessgaeTextRobot.setBody(mTextMsgRobot);
+        mAdapter.addData(mMessgaeTextRobot);
+
+        // TODO 欢迎语
+        Message mMessgaeText1 = getBaseReceiveMessage(MsgType.TEXT);
+        TextMsgBody mTextMsgBody1 = new TextMsgBody();
+        mTextMsgBody1.setMessage("Hi~很高兴与您见面，JIMI有什么能帮到您？");
+        mMessgaeText1.setBody(mTextMsgBody1);
+        mMessgaeText1.setSenderId(ChatActivity.mTargetId);
+        mAdapter.addData(mMessgaeText1);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                tvAskOtherQuestion.setVisibility(View.VISIBLE);
+            }
+        }, 1000);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initMenu();
+            }
+        }, 500);
+    }
+
+    private void initMenu() {
+        // TODO 一级菜单
+        Message messageMenuFirstLevel = getBaseReceiveMessage(MsgType.MENU_FIRST_LEVEL);
+        messageMenuFirstLevel.setBody(new MenuFirstLevelMsgBody());
+        mAdapter.addData(messageMenuFirstLevel);
+        // TODO 二级菜单
+        Message messageMenuSecondLevel = getBaseReceiveMessage(MsgType.MENU_SECOND_LEVEL);
+        messageMenuSecondLevel.setBody(new MenuSecondLevelMsgBody());
+        mAdapter.addData(messageMenuSecondLevel);
+    }
+
     @Override
     public void onRefresh() {
         //下拉刷新模拟获取历史消息
@@ -243,7 +397,6 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 //        mAdapter.addData(0, mReceiveMsgList);
         mSwipeRefresh.setRefreshing(false);
     }
-
 
     private void initChatUi() {
         //mBtnAudio
@@ -300,7 +453,7 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     }
 
-    @OnClick({R.id.btn_send, R.id.rlPhoto, R.id.rlVideo, R.id.rlLocation, R.id.rlFile})
+    @OnClick({R.id.btn_send, R.id.rlPhoto, R.id.rlVideo, R.id.rlLocation, R.id.rlFile, R.id.tvAskOtherQuestion, R.id.tvCovid19, R.id.tvReturnGoods, R.id.tvModifyOrder, R.id.layoutCloseOrderList})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_send:
@@ -318,7 +471,139 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                 break;
             case R.id.rlLocation:
                 break;
+            case R.id.tvAskOtherQuestion:
+                Message mMessgaeTextAskOtherQuestion = getBaseSendMessage(MsgType.TEXT);
+                TextMsgBody mTextMsgBodyAskOtherQuestion = new TextMsgBody();
+                mTextMsgBodyAskOtherQuestion.setMessage("我有别的问题要咨询。");
+                mMessgaeTextAskOtherQuestion.setBody(mTextMsgBodyAskOtherQuestion);
+                mAdapter.addData(mMessgaeTextAskOtherQuestion);
+                updateMsg(mMessgaeTextAskOtherQuestion, new MessageSendCallback() {
+                    @Override
+                    public void onSent() {
+                        Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                        TextMsgBody mTextMsgBody = new TextMsgBody();
+                        mTextMsgBody.setMessage("请问您想咨询什么问题呢~");
+                        mMessgaeText.setBody(mTextMsgBody);
+                        mAdapter.addData(mMessgaeText);
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tvAskOtherQuestion.setVisibility(View.GONE);
+                                layoutOtherQuestion.setVisibility(View.VISIBLE);
+                            }
+                        }, 200);
+                    }
+                });
+                break;
+            case R.id.tvCovid19:
+                Message mMessgaeTextCovid19 = getBaseSendMessage(MsgType.TEXT);
+                TextMsgBody mTextMsgBodyCovid19 = new TextMsgBody();
+                mTextMsgBodyCovid19.setMessage("我想查看疫情实况。");
+                mMessgaeTextCovid19.setBody(mTextMsgBodyCovid19);
+                mAdapter.addData(mMessgaeTextCovid19);
+                updateMsg(mMessgaeTextCovid19, new MessageSendCallback() {
+                    @Override
+                    public void onSent() {
+                        Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                        TextMsgBody mTextMsgBody = new TextMsgBody();
+                        mTextMsgBody.setMessage("好的，已为您开启疫情实况页面。");
+                        mMessgaeText.setBody(mTextMsgBody);
+                        mAdapter.addData(mMessgaeText);
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRvChat.smoothScrollBy(0, 10000);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intentSecondMenu3 = new Intent(ChatActivity.this, WebViewActivity.class);
+                                        intentSecondMenu3.putExtra("title", "疫情实况");
+                                        startActivity(intentSecondMenu3);
+                                    }
+                                }, 300);
+                            }
+                        }, 100);
+                    }
+                });
+                break;
+            case R.id.tvReturnGoods:
+                showOrderList("我要退换货。");
+                break;
+            case R.id.tvModifyOrder:
+                showOrderList("我要修改订单。");
+                break;
+            case R.id.layoutCloseOrderList:
+                ObjectAnimator objectAnimator = ObjectAnimator
+                        .ofFloat(layoutOrderListPopup, "translationY", 0, 500 * 3);
+                objectAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        layoutOrderListPopupBg.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+                AnimatorSet animationSet = new AnimatorSet();
+                animationSet.play(objectAnimator);
+                animationSet.setDuration(300).start();
+                break;
         }
+    }
+
+    private void showOrderList(String question) {
+        Message mMessgaeTextCovid19 = getBaseSendMessage(MsgType.TEXT);
+        TextMsgBody mTextMsgBodyCovid19 = new TextMsgBody();
+        mTextMsgBodyCovid19.setMessage(question);
+        mMessgaeTextCovid19.setBody(mTextMsgBodyCovid19);
+        mAdapter.addData(mMessgaeTextCovid19);
+        updateMsg(mMessgaeTextCovid19, new MessageSendCallback() {
+            @Override
+            public void onSent() {
+                Message mMessgaeText = getBaseReceiveMessage(MsgType.TEXT);
+                TextMsgBody mTextMsgBody = new TextMsgBody();
+                mTextMsgBody.setMessage("好的，请选择您要处理的订单。");
+                mMessgaeText.setBody(mTextMsgBody);
+                mAdapter.addData(mMessgaeText);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRvChat.smoothScrollBy(0, 10000);
+
+                        // 动画弹出 订单列表 窗口
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                layoutOrderListPopupBg.setVisibility(View.VISIBLE);
+
+                                ObjectAnimator objectAnimator = ObjectAnimator
+                                        .ofFloat(layoutOrderListPopup, "translationY", 500 * 3, 0);
+                                AnimatorSet animationSet = new AnimatorSet();
+                                animationSet.play(objectAnimator);
+                                animationSet.setDuration(500).start();
+                            }
+                        }, 300);
+
+                    }
+                }, 100);
+            }
+        });
     }
 
 
@@ -365,7 +650,6 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
         updateMsg(mMessgae);
     }
 
-
     //图片消息
     private void sendImageMessage(final LocalMedia media) {
         final Message mMessgae = getBaseSendMessage(MsgType.IMAGE);
@@ -377,7 +661,6 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
         //模拟两秒后发送成功
         updateMsg(mMessgae);
     }
-
 
     //视频消息
     private void sendVedioMessage(final LocalMedia media) {

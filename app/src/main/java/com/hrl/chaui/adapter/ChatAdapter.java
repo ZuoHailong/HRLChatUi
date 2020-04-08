@@ -1,7 +1,6 @@
 package com.hrl.chaui.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.AnimationDrawable;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -11,6 +10,8 @@ import com.chad.library.adapter.base.util.MultiTypeDelegate;
 import com.hrl.chaui.R;
 import com.hrl.chaui.activity.ChatActivity;
 import com.hrl.chaui.bean.AudioMsgBody;
+import com.hrl.chaui.bean.ButtonMsgBody;
+import com.hrl.chaui.bean.CommonQuestionListMsgBody;
 import com.hrl.chaui.bean.FileMsgBody;
 import com.hrl.chaui.bean.ImageMsgBody;
 import com.hrl.chaui.bean.MenuFirstLevelMsgBody;
@@ -22,9 +23,10 @@ import com.hrl.chaui.bean.MsgType;
 import com.hrl.chaui.bean.TextMsgBody;
 import com.hrl.chaui.bean.VideoMsgBody;
 import com.hrl.chaui.util.GlideUtils;
-import com.hrl.chaui.widget.BubbleImageView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
@@ -42,6 +44,9 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
     private static final int TYPE_RECEIVE_AUDIO = 10;
     private static final int TYPE_MENU_FIRST_LEVEL = 20;
     private static final int TYPE_MENU_SECOND_LEVEL = 21;
+    private static final int TYPE_CENTER_TEXT_GRAY_BG = 22;
+    private static final int TYPE_COMMON_QUESTION_LIST = 24;
+    private static final int TYPE_BUTTON = 25;
 
     private static final int SEND_TEXT = R.layout.item_text_send;
     private static final int RECEIVE_TEXT = R.layout.item_text_receive;
@@ -55,6 +60,9 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
     private static final int SEND_AUDIO = R.layout.item_audio_send;
     private static final int MENU_FIRST_LEVEL = R.layout.item_menu_first_level;
     private static final int MENU_SECOND_LEVEL = R.layout.item_menu_second_level;
+    private static final int CENTER_TEXT_GRAY_BG = R.layout.item_gray_bg;
+    private static final int COMMON_QUESTION_LIST = R.layout.item_common_question_list;
+    private static final int BUTTON = R.layout.item_button;
     /*
     private static final int SEND_LOCATION = R.layout.item_location_send;
     private static final int RECEIVE_LOCATION = R.layout.item_location_receive;*/
@@ -80,6 +88,12 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
                     return TYPE_MENU_FIRST_LEVEL;
                 } else if (MsgType.MENU_SECOND_LEVEL == entity.getMsgType()) {
                     return TYPE_MENU_SECOND_LEVEL;
+                } else if (MsgType.CENTER_TEXT_GRAY_BG == entity.getMsgType()) {
+                    return TYPE_CENTER_TEXT_GRAY_BG;
+                } else if (MsgType.COMMON_QUESTION_LIST == entity.getMsgType()) {
+                    return TYPE_COMMON_QUESTION_LIST;
+                } else if (MsgType.BUTTON == entity.getMsgType()) {
+                    return TYPE_BUTTON;
                 }
                 return 0;
             }
@@ -95,7 +109,10 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
                 .registerItemType(TYPE_SEND_AUDIO, SEND_AUDIO)
                 .registerItemType(TYPE_RECEIVE_AUDIO, RECEIVE_AUDIO)
                 .registerItemType(TYPE_MENU_FIRST_LEVEL, MENU_FIRST_LEVEL)
-                .registerItemType(TYPE_MENU_SECOND_LEVEL, MENU_SECOND_LEVEL);
+                .registerItemType(TYPE_MENU_SECOND_LEVEL, MENU_SECOND_LEVEL)
+                .registerItemType(TYPE_CENTER_TEXT_GRAY_BG, CENTER_TEXT_GRAY_BG)
+                .registerItemType(TYPE_COMMON_QUESTION_LIST, COMMON_QUESTION_LIST)
+                .registerItemType(TYPE_BUTTON, BUTTON);
     }
 
     @Override
@@ -171,6 +188,12 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
         } else if (item.getMsgType().equals(MsgType.AUDIO)) {
             AudioMsgBody msgBody = (AudioMsgBody) item.getBody();
             helper.setText(R.id.tvDuration, msgBody.getDuration() + "\"");
+        } else if (item.getMsgType().equals(MsgType.CENTER_TEXT_GRAY_BG)) {
+            TextMsgBody msgBody = (TextMsgBody) item.getBody();
+            helper.setText(R.id.tvGrayBg, msgBody.getMessage());
+        } else if (item.getMsgType().equals(MsgType.BUTTON)) {
+            ButtonMsgBody msgBody = (ButtonMsgBody) item.getBody();
+            helper.setText(R.id.button, msgBody.getMessage());
         }
     }
 
@@ -193,6 +216,13 @@ public class ChatAdapter extends BaseQuickAdapter<Message, BaseViewHolder> {
             helper.addOnClickListener(R.id.layoutSecondMenu3);
             helper.addOnClickListener(R.id.layoutSecondMenu4);
             helper.addOnClickListener(R.id.layoutSecondMenu5);
+        } else if (msgContent instanceof ButtonMsgBody) {
+            helper.addOnClickListener(R.id.button);
+        } else if (msgContent instanceof CommonQuestionListMsgBody) {
+            helper.addOnClickListener(R.id.tvCommonQuestion1);
+            helper.addOnClickListener(R.id.tvCommonQuestion2);
+            helper.addOnClickListener(R.id.tvCommonQuestion3);
+            helper.addOnClickListener(R.id.tvCommonQuestion4);
         }
     }
 

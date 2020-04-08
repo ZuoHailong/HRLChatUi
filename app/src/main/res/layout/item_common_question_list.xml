@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/item_tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#999999"
+        android:textSize="12dp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp">
+
+        <com.hrl.chaui.widget.CircleImageView
+            android:id="@+id/chat_item_header"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_head_default_left" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/chat_item_header">
+
+            <View
+                android:id="@+id/viewBg"
+                android:layout_width="match_parent"
+                android:layout_height="234dp"
+                android:background="@drawable/message_text_receive"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:text="您是否遇到以下问题了呢？可点击进行查看，若没有您想问的，可以直接在输入框进行提问，或者联系在线客服哦："
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toTopOf="@id/viewBg" />
+
+            <View
+                android:id="@+id/line0"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/line_stroke"
+                app:layout_constraintTop_toBottomOf="@id/tv1" />
+
+            <TextView
+                android:id="@+id/tvCommonQuestion1"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:text="怎么用白条付款，有利息吗"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toBottomOf="@id/line0" />
+
+            <View
+                android:id="@+id/line1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/line_stroke"
+                app:layout_constraintTop_toBottomOf="@id/tvCommonQuestion1" />
+
+            <TextView
+                android:id="@+id/tvCommonQuestion2"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:text="金条是什么"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toBottomOf="@id/line1" />
+
+            <View
+                android:id="@+id/line2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/line_stroke"
+                app:layout_constraintTop_toBottomOf="@id/tvCommonQuestion2" />
+
+            <TextView
+                android:id="@+id/tvCommonQuestion3"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:text="怎么联系商家"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toBottomOf="@id/line2" />
+
+            <View
+                android:id="@+id/line3"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/line_stroke"
+                app:layout_constraintTop_toBottomOf="@id/tvCommonQuestion3" />
+
+            <TextView
+                android:id="@+id/tvCommonQuestion4"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center_vertical"
+                android:text="怎么修改/删除评价晒单"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toBottomOf="@id/line3" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_arrow_right"
+                app:layout_constraintBottom_toBottomOf="@id/tvCommonQuestion1"
+                app:layout_constraintEnd_toEndOf="@id/tvCommonQuestion1"
+                app:layout_constraintTop_toTopOf="@id/tvCommonQuestion1" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_arrow_right"
+                app:layout_constraintBottom_toBottomOf="@id/tvCommonQuestion2"
+                app:layout_constraintEnd_toEndOf="@id/tvCommonQuestion2"
+                app:layout_constraintTop_toTopOf="@id/tvCommonQuestion2" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_arrow_right"
+                app:layout_constraintBottom_toBottomOf="@id/tvCommonQuestion3"
+                app:layout_constraintEnd_toEndOf="@id/tvCommonQuestion3"
+                app:layout_constraintTop_toTopOf="@id/tvCommonQuestion3" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_arrow_right"
+                app:layout_constraintBottom_toBottomOf="@id/tvCommonQuestion4"
+                app:layout_constraintEnd_toEndOf="@id/tvCommonQuestion4"
+                app:layout_constraintTop_toTopOf="@id/tvCommonQuestion4" />
+        </android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
+</LinearLayout>

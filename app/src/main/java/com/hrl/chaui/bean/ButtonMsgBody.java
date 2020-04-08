@@ -1,7 +1,9 @@
 package com.hrl.chaui.bean;
 
-
-public class TextMsgBody extends MsgBody {
+/**
+ * Created by ZuoHailong on 2020/4/7.
+ */
+public class ButtonMsgBody extends MsgBody {
     private String message;
     private String extra;
 
@@ -9,7 +11,7 @@ public class TextMsgBody extends MsgBody {
         return message;
     }
 
-    public TextMsgBody setMessage(String message) {
+    public ButtonMsgBody setMessage(String message) {
         this.message = message;
         return this;
     }
@@ -18,7 +20,7 @@ public class TextMsgBody extends MsgBody {
         return extra;
     }
 
-    public TextMsgBody setExtra(String extra) {
+    public ButtonMsgBody setExtra(String extra) {
         this.extra = extra;
         return this;
     }

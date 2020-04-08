@@ -6,4 +6,7 @@
 
     <color name="bg_color">#eeeeee</color>
     <color name="line">#aaaaaa</color>
+    <color name="gray_dark">#bbb</color>
+    <color name="btn_bg_blue">#CCEAFF</color>
+    <color name="text_color">#333</color>
 </resources>
