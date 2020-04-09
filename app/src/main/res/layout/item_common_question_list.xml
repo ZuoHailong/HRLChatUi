@@ -71,7 +71,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="center_vertical"
-                android:text="怎么用白条付款，有利息吗"
+                android:text="补差是什么"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/line0" />
@@ -92,7 +92,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="center_vertical"
-                android:text="金条是什么"
+                android:text="申请补差的规则是什么"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/line1" />
@@ -113,7 +113,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="center_vertical"
-                android:text="怎么联系商家"
+                android:text="什么人可以申请补差"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/line2" />
@@ -134,7 +134,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="center_vertical"
-                android:text="怎么修改/删除评价晒单"
+                android:text="补差款多久可以到账"
                 android:textColor="@color/text_color"
                 android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/line3" />

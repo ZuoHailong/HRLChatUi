@@ -296,23 +296,37 @@
 
     </LinearLayout>
 
-    <!--订单列表-->
+    <!--订单、物流-->
     <RelativeLayout
-        android:id="@+id/layoutOrderListPopupBg"
+        android:id="@+id/layoutPopupBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#7f000000"
         android:visibility="gone">
 
         <RelativeLayout
-            android:id="@+id/layoutOrderListPopup"
+            android:id="@+id/layoutPopup"
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_alignParentBottom="true"
             android:background="@color/white">
 
+            <RelativeLayout
+                android:id="@+id/layoutPopupBack"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:visibility="invisible">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/ic_back" />
+
+            </RelativeLayout>
+
             <LinearLayout
-                android:id="@+id/layoutCloseOrderList"
+                android:id="@+id/layoutPopupClose"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_alignParentTop="true"
@@ -331,32 +345,153 @@
                 android:id="@+id/tv2"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
+                android:layout_toRightOf="@id/layoutPopupBack"
                 android:gravity="center_vertical"
-                android:paddingLeft="20dp"
                 android:text="请选择您要咨询的订单"
                 android:textColor="@color/text_color"
                 android:textSize="14sp" />
 
             <View
+                android:id="@+id/line4"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_below="@id/tv2"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/line_stroke" />
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/line_horizontical" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:paddingBottom="80dp"
-                android:text="订单列表"
-                android:textColor="@color/text_color"
-                android:textSize="18sp" />
+            <!-- 订单/物流 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/line4"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <!-- 订单列表 -->
+                <LinearLayout
+                    android:id="@+id/layoutOrderList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:gravity="center_vertical"
+                        android:text="订单一"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@drawable/line_stroke" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:gravity="center_vertical"
+                        android:text="订单二"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@drawable/line_stroke" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:gravity="center_vertical"
+                        android:text="订单三"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@drawable/line_stroke" />
+
+                </LinearLayout>
+
+                <!-- 物流详情 -->
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/layoutLogistics"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tv1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="04-09"
+                        android:textColor="@color/text_color"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="10:30"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="@id/tv1"
+                        app:layout_constraintTop_toBottomOf="@id/tv1" />
+
+                    <ImageView
+                        android:id="@+id/iv1"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginStart="10dp"
+                        android:src="@mipmap/ic_logistics_car"
+                        app:layout_constraintBottom_toBottomOf="@id/tv1"
+                        app:layout_constraintStart_toEndOf="@id/tv1"
+                        app:layout_constraintTop_toTopOf="@id/tv1" />
+
+                    <TextView
+                        android:id="@+id/tv5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="运输中"
+                        android:textColor="@color/text_color"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="@id/iv1"
+                        app:layout_constraintStart_toEndOf="@id/iv1"
+                        app:layout_constraintTop_toTopOf="@id/iv1" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:lineSpacingExtra="3dp"
+                        android:text="【郑州市】已离开 河南郑州公司；发往 河南郑州公司航空港区分部"
+                        android:textColor="@color/text_color"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tv5"
+                        app:layout_constraintTop_toBottomOf="@id/tv5" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="60dp"
+                        android:background="#ddd"
+                        app:layout_constraintEnd_toEndOf="@id/iv1"
+                        app:layout_constraintStart_toStartOf="@id/iv1"
+                        app:layout_constraintTop_toBottomOf="@id/iv1" />
+
+                </android.support.constraint.ConstraintLayout>
+
+            </FrameLayout>
 
         </RelativeLayout>
 
     </RelativeLayout>
-
 
 </RelativeLayout>

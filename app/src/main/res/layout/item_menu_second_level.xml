@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:background="@color/bg_color" />
 
-        <!--我要催单-->
+        <!--补差-->
         <LinearLayout
             android:id="@+id/layoutSecondMenu1"
             android:layout_width="80dp"
@@ -27,65 +27,20 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_message" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_account_record" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="我要催单"
-                android:textSize="12sp" />
+                android:layout_marginTop="10dp"
+                android:text="补差"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
         </LinearLayout>
 
-        <!--退货返修-->
-        <LinearLayout
-            android:id="@+id/layoutSecondMenu2"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:background="@color/white"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_fix" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="退货返修"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!--疫情助理-->
-        <LinearLayout
-            android:id="@+id/layoutSecondMenu3"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:background="@color/white"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_service" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="疫情助理"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!--余额提现-->
+        <!--物流-->
         <LinearLayout
             android:id="@+id/layoutSecondMenu4"
             android:layout_width="80dp"
@@ -96,19 +51,68 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_balance" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_order_query" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="余额提现"
-                android:textSize="12sp" />
+                android:layout_marginTop="10dp"
+                android:text="物流"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
         </LinearLayout>
 
-        <!--账户安全-->
+        <!--返利-->
+        <LinearLayout
+            android:id="@+id/layoutSecondMenu2"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_subsidy" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="返利"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!--贷款-->
+        <LinearLayout
+            android:id="@+id/layoutSecondMenu3"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_account_flow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="货款"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!--订货-->
         <LinearLayout
             android:id="@+id/layoutSecondMenu5"
             android:layout_width="80dp"
@@ -119,16 +123,41 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_safty" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_certification" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="账户安全"
-                android:textSize="12sp" />
+                android:layout_marginTop="10dp"
+                android:text="订货"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!--投诉-->
+        <LinearLayout
+            android:id="@+id/layoutSecondMenu6"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_feedback" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="投诉"
+                android:textColor="@color/text_color"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <View
